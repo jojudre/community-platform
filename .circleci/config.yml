@@ -400,7 +400,7 @@ workflows:
               ignore: 
                 - production
       - test_functions: 
-          name: 'Functions Test'
+          name: 'Cloud Function tests'
       - test_e2e:
           name: e2e-<< matrix.CI_BROWSER >>-<< matrix.CI_NODE >>
           requires:
