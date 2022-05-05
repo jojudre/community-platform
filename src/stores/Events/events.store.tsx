@@ -1,16 +1,20 @@
 import { observable, computed, toJS, makeObservable } from 'mobx'
-import { IEventFormInput, IEventDB, IEvent } from 'src/models/events.models'
+import type {
+  IEventFormInput,
+  IEventDB,
+  IEvent,
+} from 'src/models/events.models'
 import { ModuleStore } from '../common/module.store'
 import Filters from 'src/utils/filters'
-import { ISelectedTags } from 'src/models/tags.model'
-import { RootStore } from '..'
-import { ILocation } from 'src/models/common.models'
+import type { ISelectedTags } from 'src/models/tags.model'
+import type { RootStore } from '..'
+import type { ILocation } from 'src/models/common.models'
 import {
   stripSpecialCharacters,
   hasAdminRights,
   needsModeration,
 } from 'src/utils/helpers'
-import { IUser } from 'src/models/user.models'
+import type { IUser } from 'src/models/user.models'
 
 export class EventStore extends ModuleStore {
   constructor(rootStore: RootStore) {
@@ -36,7 +40,7 @@ export class EventStore extends ModuleStore {
     const activeUser = this.activeUser
     const isAdmin = hasAdminRights(activeUser)
 
-    return this.allEvents.filter(event => {
+    return this.allEvents.filter((event) => {
       // dates saved as yyyy-mm-dd string so convert to date object for comparison
       return (
         Filters.newerThan(event.date, 'yesterday') &&
@@ -47,7 +51,7 @@ export class EventStore extends ModuleStore {
     })
   }
   @computed get pastEvents() {
-    return this.allEvents.filter(event => {
+    return this.allEvents.filter((event) => {
       return Filters.olderThan(event.date, 'today')
     })
   }

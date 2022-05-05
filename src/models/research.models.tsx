@@ -1,6 +1,24 @@
-import { IConvertedFileMeta } from 'src/components/ImageInput/ImageInput'
-import { DBDoc, IModerable, ISelectedTags } from 'src/models'
-import { IUploadedFileMeta } from 'src/stores/storage'
+import type { IConvertedFileMeta } from '../types'
+import type { DBDoc, IComment, IModerable, ISelectedTags } from '.'
+import type { IUploadedFileMeta } from '../stores/storage'
+
+// By default all how-to form input fields come as strings
+// The IResearch interface can imposes the correct formats on fields
+// Additionally convert from local filemeta to uploaded filemeta
+export interface IResearch extends IModerable {
+  _createdBy: string
+  cover_image: IUploadedFileMeta
+  files: Array<IUploadedFileMeta | File | null>
+}
+
+/**
+ * Research retrieved from the database also include metadata such as _id, _created and _modified
+ */
+export type IResearchDB = IResearch & DBDoc
+
+export type IResearchStats = {
+  votedUsefulCount: number
+}
 
 /** All typings related to the Research Module can be found here */
 export namespace IResearch {
@@ -16,6 +34,7 @@ export namespace IResearch {
     description: string
     images: Array<IUploadedFileMeta | IConvertedFileMeta | null>
     videoUrl?: string
+    comments?: IComment[]
   }
 
   export interface FormInput extends IModerable {
@@ -23,6 +42,7 @@ export namespace IResearch {
     description: string
     slug: string
     tags: ISelectedTags
+    creatorCountry?: string
   }
 
   /** Research items synced from the database will contain additional metadata */

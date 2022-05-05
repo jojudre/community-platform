@@ -6,7 +6,7 @@ import 'react-leaflet-markercluster/dist/styles.min.css'
 
 import { createClusterIcon, createMarkerIcon } from './Sprites'
 
-import { IMapPin } from 'src/models/maps.models'
+import type { IMapPin } from 'src/models/maps.models'
 
 interface IProps {
   pins: Array<IMapPin>
@@ -33,7 +33,7 @@ export const Clusters: React.FunctionComponent<IProps> = ({
     >
       {pins
         .filter(({ location }) => Boolean(location))
-        .map(pin => (
+        .map((pin) => (
           <Marker
             key={pin._id}
             position={[pin.location.lat, pin.location.lng]}

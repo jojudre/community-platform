@@ -1,10 +1,8 @@
-import styled from 'styled-components'
-import {
-  Flex as RebassFlex,
-  FlexProps as RebassFlexProps,
-} from 'rebass/styled-components'
+import styled from '@emotion/styled'
+import type { FlexProps as ThemeUiFlexProps } from 'theme-ui'
+import { Flex as ThemeUiFlex } from 'theme-ui'
 
-export interface IFlexProps extends RebassFlexProps {
+interface IFlexProps extends ThemeUiFlexProps {
   border?: boolean
   littleRadius?: boolean
   mediumRadius?: boolean
@@ -15,21 +13,19 @@ export interface IFlexProps extends RebassFlexProps {
   mediumScale?: boolean
 }
 
-type FlexProps = IFlexProps & RebassFlexProps
-
-export const card = (props: IFlexProps) =>
+const card = (props: IFlexProps) =>
   props.card ? { border: '2px solid black' } : null
 
-export const littleRadius = (props: IFlexProps) =>
+const littleRadius = (props: IFlexProps) =>
   props.littleRadius ? { borderRadius: '5px' } : null
 
-export const mediumRadius = (props: IFlexProps) =>
+const mediumRadius = (props: IFlexProps) =>
   props.mediumRadius ? { borderRadius: '10px' } : null
 
-export const largeRadius = (props: IFlexProps) =>
+const largeRadius = (props: IFlexProps) =>
   props.largeRadius ? { borderRadius: '15px' } : null
 
-export const littleScale = (props: IFlexProps) =>
+const littleScale = (props: IFlexProps) =>
   props.littleScale
     ? {
         transition: '.2s ease-in-out',
@@ -39,7 +35,7 @@ export const littleScale = (props: IFlexProps) =>
       }
     : null
 
-export const mediumScale = (props: IFlexProps) =>
+const mediumScale = (props: IFlexProps) =>
   props.mediumScale
     ? {
         transition: '.2s ease-in-out',
@@ -49,7 +45,19 @@ export const mediumScale = (props: IFlexProps) =>
       }
     : null
 
-export const BaseFlex = styled(RebassFlex as any)`
+export const Flex = styled(ThemeUiFlex, {
+  // avoid passing on custom props
+  shouldForwardProp: (prop: keyof IFlexProps) => {
+    return ![
+      'littleRadius',
+      'mediumRadius',
+      'largeRadius',
+      'card',
+      'littleScale',
+      'mediumScale',
+    ].includes(prop)
+  },
+})<IFlexProps>`
   ${littleRadius}
   ${mediumRadius}
   ${largeRadius}
@@ -57,10 +65,5 @@ export const BaseFlex = styled(RebassFlex as any)`
   ${littleScale}
   ${mediumScale}
 `
-
-// TODO - incorporate custom css into rebass props to allow things like below to be passed
-export const Flex = (props: FlexProps) => (
-  <BaseFlex {...(props as any)}>{props.children}</BaseFlex>
-)
 
 export default Flex

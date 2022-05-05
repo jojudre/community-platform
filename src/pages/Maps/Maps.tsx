@@ -1,16 +1,17 @@
 import * as React from 'react'
 import { inject, observer } from 'mobx-react'
-import { RouteComponentProps, withRouter, Route, Switch } from 'react-router'
+import type { RouteComponentProps } from 'react-router'
+import { withRouter, Route, Switch } from 'react-router'
 
-import { MapsStore } from 'src/stores/Maps/maps.store'
+import type { MapsStore } from 'src/stores/Maps/maps.store'
 import { MapView, Controls } from './Content'
-import { Box } from 'rebass/styled-components'
+import { Box } from 'theme-ui'
 
 import './styles.css'
 
-import { ILatLng } from 'src/models/maps.models'
+import type { ILatLng } from 'src/models/maps.models'
 import { GetLocation } from 'src/utils/geolocation'
-import { Map } from 'react-leaflet'
+import type { Map } from 'react-leaflet'
 import { MAP_GROUPINGS } from 'src/stores/Maps/maps.groupings'
 
 interface IProps extends RouteComponentProps<any> {
@@ -99,27 +100,27 @@ class MapsPage extends React.Component<IProps, IState> {
     const { center, zoom } = this.state
     return (
       // the calculation for the height is kind of hacky for now, will set properly on final mockups
-      <Box id="mapPage" sx={{ height: 'calc(100vh - 80px)' }}>
+      <Box id="mapPage" sx={{ height: 'calc(100vh - 80px)', width: '100%' }}>
         <Switch>
           <Route
             exact
             path="/map"
-            render={props => (
+            render={(props) => (
               <>
                 <Controls
                   mapRef={this.mapRef}
                   availableFilters={MAP_GROUPINGS}
-                  onFilterChange={selected => {
+                  onFilterChange={(selected) => {
                     this.props.mapsStore.setActivePinFilters(selected)
                   }}
-                  onLocationChange={latlng => this.setCenter(latlng)}
+                  onLocationChange={(latlng) => this.setCenter(latlng)}
                   {...props}
                 />
                 <MapView
                   mapRef={this.mapRef}
                   pins={filteredPins}
                   filters={activePinFilters}
-                  onBoundingBoxChange={boundingBox =>
+                  onBoundingBoxChange={(boundingBox) =>
                     this.props.mapsStore.setMapBoundingBox(boundingBox)
                   }
                   center={center}

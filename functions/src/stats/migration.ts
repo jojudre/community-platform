@@ -35,6 +35,7 @@ export const migrateUserStats = functions.https.onCall(
           stats: {
             userCreatedEvents: allEventsByUser[userId] || {},
             userCreatedHowtos: allHowtosByUser[userId] || {},
+            userCreatedResearch: {},
           },
           _modified: new Date().toISOString(),
         }
@@ -53,21 +54,6 @@ export const migrateUserStats = functions.https.onCall(
       operations,
       meta: { allHowtosByUser, allHowtos, allEventsByUser, allEvents },
     }
-    /**
-     * No longer required - chunking writes
-     */
-    //   // split updates into chunks with sleep between commits to comply with firebase max writes
-    //   // https://firebase.google.com/docs/firestore/quotas#writes_and_transactions
-    //   const writeChunks = _splitArrayToChunks<any>(userUpdates, 500)
-    //   for (const chunk of writeChunks) {
-    //     const batch = db.batch()
-    //     chunk.forEach(user =>
-
-    //     )
-    //     await batch.commit()
-    //     await _sleep(1000)
-    //   }
-    // }
   },
 )
 
@@ -79,7 +65,7 @@ export const migrateUserStats = functions.https.onCall(
  */
 function calcUserHowtos(howtos: IHowtoDB[]) {
   const allHowTosByUser = {}
-  howtos.forEach(v => {
+  howtos.forEach((v) => {
     const createdBy = v._createdBy || '_anonymous'
     allHowTosByUser[createdBy] = allHowTosByUser[createdBy] || {}
     allHowTosByUser[createdBy][v._id] = v.moderation
@@ -92,15 +78,10 @@ function calcUserHowtos(howtos: IHowtoDB[]) {
  */
 function calcUserEvents(events: IEventDB[]) {
   const allEventsByUser = {}
-  events.forEach(v => {
+  events.forEach((v) => {
     const createdBy = v._createdBy || '_anonymous'
     allEventsByUser[createdBy] = allEventsByUser[createdBy] || {}
     allEventsByUser[createdBy][v._id] = v.moderation
   })
   return allEventsByUser
-}
-
-
-function _sleep(ms: number) {
-  return new Promise(resolve => setTimeout(resolve, ms))
 }

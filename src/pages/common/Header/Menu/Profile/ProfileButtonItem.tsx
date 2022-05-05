@@ -1,10 +1,11 @@
-import * as React from 'react';
-import styled from 'styled-components'
+import * as React from 'react'
+import styled from '@emotion/styled'
 import { Link } from 'src/components/Links'
-import { Button } from 'src/components/Button'
-import { display, DisplayProps } from 'styled-system'
+import { Button } from 'oa-components'
+import type { DisplayProps } from 'styled-system'
+import { display } from 'styled-system'
 import { observer, inject } from 'mobx-react'
-import { MobileMenuStore } from 'src/stores/MobileMenu/mobilemenu.store'
+import type { MobileMenuStore } from 'src/stores/MobileMenu/mobilemenu.store'
 
 const ButtonSign = styled(Button as any)<DisplayProps>`
   ${display};
@@ -18,7 +19,9 @@ interface IProps {
   isMobile?: boolean
 }
 
-interface IProps {}
+interface IProps {
+  sx?: any
+}
 
 interface IInjectedProps extends IProps {
   mobileMenuStore: MobileMenuStore
@@ -37,20 +40,21 @@ export class ProfileButtonItem extends React.Component<IProps> {
   }
   render() {
     const menu = this.injected.mobileMenuStore
+    console.log(`ProfileButtonItem`, this.props.sx)
     return (
       <>
-        <Link to={this.props.link}>
+        <Link to={this.props.link} sx={{ minWidth: 'auto' }}>
           <ButtonSign
             onClick={() => this.props.isMobile && menu.toggleMobilePanel()}
             variant={this.props.variant}
-            display={
-              this.props.isMobile
-                ? ['flex', 'flex', 'none']
-                : ['none', 'none', 'flex']
-            }
             {...(this.props.isMobile ? { large: true } : { medium: true })}
             data-cy={this.props.text.toLowerCase()}
-            style={this.props.style}
+            sx={{
+              ...this.props.sx,
+              display: this.props.isMobile
+                ? ['flex', 'flex', 'none']
+                : ['none', 'none', 'flex'],
+            }}
           >
             {this.props.text}
           </ButtonSign>

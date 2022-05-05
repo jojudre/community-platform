@@ -1,4 +1,5 @@
-import { spawnSync, SpawnSyncOptions } from 'child_process'
+import type { SpawnSyncOptions } from 'child_process'
+import { spawnSync } from 'child_process'
 import chalk from 'chalk'
 import { generateDBEndpoints } from 'oa-shared'
 
@@ -16,7 +17,7 @@ const STORAGE_BUCKET = 'onearmyworld-exports'
 /** Path to a service account file that will be used for operations */
 const SERVICE_ACCOUNT_JSON_PATH = 'config/onearmy-migrator-service-account.json'
 /** Timestamp suffix that will be appended to exports (e.g. 2021-01-26T0750) */
-const timestamp = new Date().toISOString().substring(0, 16).replace(':','')
+const timestamp = new Date().toISOString().substring(0, 16).replace(':', '')
 /** Storage path that will be used to store the exported data */
 const EXPORT_TARGET = `${STORAGE_BUCKET}/${timestamp}`
 // Specify collections and subcollections for export

@@ -1,8 +1,9 @@
-import styled from 'styled-components'
-import { Box, Text } from 'rebass/styled-components'
+import styled from '@emotion/styled'
+import { Box, Text } from 'theme-ui'
 import { Avatar } from '../Avatar'
 import { useCommonStores } from 'src/index'
 import { Link } from '../Links'
+import { MAX_COMMENT_LENGTH } from './constants'
 
 export interface IProps {
   onSubmit: (string) => Promise<void>
@@ -17,7 +18,7 @@ const TextAreaStyled = styled.textarea`
   min-width: 100%;
   max-width: 100%;
   font-family: 'Inter', Arial, sans-serif;
-  font-size: ${props => props.theme.fontSizes[2] + 'px'};
+  font-size: ${(props) => props.theme.fontSizes[2] + 'px'};
   border-radius: 5px;
   resize: none;
 
@@ -33,6 +34,7 @@ const TextAreaStyled = styled.textarea`
 const BoxStyled = styled(Box)`
   position: relative;
   border-radius: 5px;
+  display: block;
 `
 
 const AvatarBoxStyled = styled(Box)`
@@ -42,6 +44,7 @@ const AvatarBoxStyled = styled(Box)`
 `
 
 const TextBoxStyled = styled(Box)`
+  display: block;
   &::before {
     content: '';
     position: absolute;
@@ -59,6 +62,7 @@ const TextStyled = styled(Text)`
 `
 
 const LoginTextStyled = styled(Text)`
+  display: block;
   padding: 1.5em 1em;
 `
 
@@ -67,7 +71,7 @@ export const CommentTextArea = ({ onChange, comment, loading }) => {
   const user = stores.userStore.activeUser
 
   return (
-    <BoxStyled bg="white">
+    <BoxStyled sx={{ background: 'white' }}>
       <AvatarBoxStyled>
         <Avatar profileType={user?.profileType} />
       </AvatarBoxStyled>
@@ -76,8 +80,8 @@ export const CommentTextArea = ({ onChange, comment, loading }) => {
           <TextAreaStyled
             disabled={loading}
             value={comment}
-            maxLength={400}
-            onChange={event => {
+            maxLength={MAX_COMMENT_LENGTH}
+            onChange={(event) => {
               onChange(event.target.value)
             }}
             data-cy="comments-form"
@@ -99,7 +103,11 @@ export const CommentTextArea = ({ onChange, comment, loading }) => {
           </LoginTextStyled>
         )}
       </TextBoxStyled>
-      {user && <TextStyled fontSize="2">{comment.length}/400</TextStyled>}
+      {user && (
+        <TextStyled sx={{ fontSize: 2 }}>
+          {comment.length}/{MAX_COMMENT_LENGTH}
+        </TextStyled>
+      )}
     </BoxStyled>
   )
 }

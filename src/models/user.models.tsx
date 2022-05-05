@@ -1,12 +1,14 @@
 /* eslint-disable @typescript-eslint/naming-convention*/
-import {
+import type {
   ISODateString,
   ILocation,
   DBDoc,
   IModerationStatus,
 } from './common.models'
-import { IUploadedFileMeta } from 'src/stores/storage'
-import { IConvertedFileMeta } from 'src/components/ImageInput/ImageInput'
+import type { UserRole } from 'oa-shared'
+export type { UserRole }
+import type { IUploadedFileMeta } from '../stores/storage'
+import type { IConvertedFileMeta } from '../types'
 
 export interface IUserState {
   user?: IUser
@@ -41,6 +43,9 @@ export interface IUser {
   stats?: IUserStats
   /** keep a map of all howto ids that a user has voted as useful */
   votedUsefulHowtos?: { [howtoId: string]: boolean }
+  /** keep a map of all Research ids that a user has voted as useful */
+  votedUsefulResearch?: { [researchId: string]: boolean }
+  notifications?: INotification[]
 }
 
 interface IUserBadges {
@@ -65,9 +70,26 @@ interface IExternalLink {
  */
 interface IUserStats {
   userCreatedHowtos: { [id: string]: IModerationStatus }
+  userCreatedResearch: { [id: string]: IModerationStatus }
   userCreatedEvents: { [id: string]: IModerationStatus }
 }
 
 export type IUserDB = IUser & DBDoc
 
-export type UserRole = 'super-admin' | 'subscriber' | 'admin' | 'beta-tester'
+export interface INotification {
+  _id: string
+  _created: string
+  triggeredBy: {
+    displayName: string
+    userId: string
+  }
+  relevantUrl?: string
+  type: NotificationType
+  read: boolean
+}
+
+export type NotificationType =
+  | 'new_comment'
+  | 'howto_useful'
+  | 'new_comment_research'
+  | 'research_useful'

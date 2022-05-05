@@ -1,5 +1,6 @@
-import { Box, BoxProps } from 'rebass/styled-components'
-import styled from 'styled-components'
+import type { BoxProps } from 'theme-ui'
+import { Box } from 'theme-ui'
+import styled from '@emotion/styled'
 import theme from 'src/themes/styled.theme'
 import WhiteBubble0 from 'src/assets/images/white-bubble_0.svg'
 import WhiteBubble1 from 'src/assets/images/white-bubble_1.svg'

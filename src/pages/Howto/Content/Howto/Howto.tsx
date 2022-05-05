@@ -1,14 +1,15 @@
 import * as React from 'react'
-import { RouteComponentProps, Redirect } from 'react-router'
+import type { RouteComponentProps } from 'react-router'
+import { Redirect } from 'react-router'
 import { inject, observer } from 'mobx-react'
-import { HowtoStore } from 'src/stores/Howto/howto.store'
+import type { HowtoStore } from 'src/stores/Howto/howto.store'
 import HowtoDescription from './HowtoDescription/HowtoDescription'
 import Step from './Step/Step'
-import { IHowtoDB } from 'src/models/howto.models'
+import type { IHowtoDB } from 'src/models/howto.models'
 import Text from 'src/components/Text'
-import { Box, Flex } from 'rebass/styled-components'
-import { Button } from 'src/components/Button'
-import styled from 'styled-components'
+import { Box, Flex } from 'theme-ui'
+import { Button } from 'oa-components'
+import styled from '@emotion/styled'
 import theme from 'src/themes/styled.theme'
 import WhiteBubble0 from 'src/assets/images/white-bubble_0.svg'
 import WhiteBubble1 from 'src/assets/images/white-bubble_1.svg'
@@ -16,8 +17,9 @@ import WhiteBubble2 from 'src/assets/images/white-bubble_2.svg'
 import WhiteBubble3 from 'src/assets/images/white-bubble_3.svg'
 import { Link } from 'src/components/Links'
 import { Loader } from 'src/components/Loader'
-import { UserStore } from 'src/stores/User/user.store'
+import type { UserStore } from 'src/stores/User/user.store'
 import { HowToComments } from './HowToComments/HowToComments'
+import type { AggregationsStore } from 'src/stores/Aggregations/aggregations.store'
 // The parent container injects router props along with a custom slug parameter (RouteComponentProps<IRouterCustomParams>).
 // We also have injected the doc store to access its methods to get doc by slug.
 // We can't directly provide the store as a prop though, and later user a get method to define it
@@ -27,6 +29,7 @@ interface IRouterCustomParams {
 interface InjectedProps extends RouteComponentProps<IRouterCustomParams> {
   howtoStore: HowtoStore
   userStore: UserStore
+  aggregationsStore: AggregationsStore
 }
 interface IState {
   howto?: IHowtoDB
@@ -70,7 +73,7 @@ const MoreBox = styled(Box)`
   }
 `
 
-@inject('howtoStore', 'userStore')
+@inject('howtoStore', 'userStore', 'aggregationsStore')
 @observer
 export class Howto extends React.Component<
   RouteComponentProps<IRouterCustomParams>,
@@ -100,9 +103,22 @@ export class Howto extends React.Component<
     }
   }
 
-  private onUsefulClick = async (howtoId: string) => {
-    // Fire & forget
-    await this.injected.userStore.updateUsefulHowTos(howtoId)
+  private onUsefulClick = async (
+    howtoId: string,
+    howtoCreatedBy: string,
+    howToSlug: string,
+  ) => {
+    // Trigger update without waiting
+    const { userStore } = this.injected
+    userStore.updateUsefulHowTos(howtoId, howtoCreatedBy, howToSlug)
+    // Make an optimistic update of current aggregation to update UI
+    const { aggregationsStore } = this.injected
+    const votedUsefulCount =
+      aggregationsStore.aggregations.users_votedUsefulHowtos![howtoId] || 0
+    const hasUserVotedUseful = this.store.userVotedActiveHowToUseful
+    aggregationsStore.overrideAggregationValue('users_votedUsefulHowtos', {
+      [howtoId]: votedUsefulCount + (hasUserVotedUseful ? -1 : 1),
+    })
   }
 
   public async componentDidMount() {
@@ -119,30 +135,44 @@ export class Howto extends React.Component<
     const { activeHowto } = this.store
 
     if (activeHowto) {
+      const { aggregations } = this.injected.aggregationsStore
+      // Distinguish between undefined aggregations (not loaded) and undefined aggregation (no votes)
+      const votedUsefulCount = aggregations.users_votedUsefulHowtos
+        ? aggregations.users_votedUsefulHowtos[activeHowto._id] || 0
+        : undefined
+
+      const activeHowToComments = this.store.getActiveHowToComments()
+
       return (
         <>
           <HowtoDescription
             howto={activeHowto}
-            votedUsefulCount={this.store.howtoStats?.votedUsefulCount}
+            votedUsefulCount={votedUsefulCount}
             loggedInUser={loggedInUser}
             needsModeration={this.store.needsModeration(activeHowto)}
-            userVotedUseful={this.store.userVotedActiveHowToUseful}
+            hasUserVotedUseful={this.store.userVotedActiveHowToUseful}
             moderateHowto={this.moderateHowto}
-            onUsefulClick={() => this.onUsefulClick(activeHowto._id)}
+            onUsefulClick={() =>
+              this.onUsefulClick(
+                activeHowto._id,
+                activeHowto._createdBy,
+                activeHowto.slug,
+              )
+            }
           />
           <Box mt={9}>
             {activeHowto.steps.map((step: any, index: number) => (
               <Step step={step} key={index} stepindex={index} />
             ))}
           </Box>
-          <HowToComments comments={activeHowto.comments} />
+          <HowToComments comments={activeHowToComments} />
           <MoreBox py={20} mt={20}>
-            <Text bold txtcenter fontSize={[4, 4, 5]}>
+            <Text bold txtcenter sx={{ fontSize: [4, 4, 5], display: 'block' }}>
               You're done.
               <br />
               Nice one!
             </Text>
-            <Flex justifyContent={'center'} mt={2}>
+            <Flex sx={{ justifyContent: 'center' }} mt={2}>
               <Link to={'/how-to/'}>
                 <Button variant={'secondary'} data-cy="go-back">
                   Back

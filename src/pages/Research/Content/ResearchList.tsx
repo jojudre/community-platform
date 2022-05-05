@@ -1,10 +1,10 @@
 import { observer } from 'mobx-react'
-import { Box, Flex } from 'rebass/styled-components'
+import { Box, Flex } from 'theme-ui'
 import { AuthWrapper } from 'src/components/Auth/AuthWrapper'
-import { Button } from 'src/components/Button'
+import { Button } from 'oa-components'
 import Heading from 'src/components/Heading'
 import { Link } from 'src/components/Links'
-import ResearchListItem from 'src/components/Research/ResearchListItem'
+import ResearchListItem from './ResearchListItem'
 import { useResearchStore } from 'src/stores/Research/research.store'
 
 const ResearchList = observer(() => {
@@ -13,11 +13,11 @@ const ResearchList = observer(() => {
   return (
     <>
       <Flex py={26}>
-        <Heading medium bold txtcenter width={1}>
+        <Heading medium bold txtcenter sx={{ width: '100%' }}>
           Research topics. Can we...
         </Heading>
       </Flex>
-      {filteredResearches.map(item => (
+      {filteredResearches.map((item) => (
         <ResearchListItem key={item._id} item={item} />
       ))}
       <Box mb={4}>

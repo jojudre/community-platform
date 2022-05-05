@@ -1,6 +1,7 @@
-import L, { MarkerCluster } from 'leaflet'
+import type { MarkerCluster } from 'leaflet'
+import L from 'leaflet'
 import './sprites.css'
-import { IMapPin } from 'src/models/maps.models'
+import type { IMapPin } from 'src/models/maps.models'
 import clusterIcon from 'src/assets/icons/map-cluster.svg'
 import Workspace from 'src/pages/User/workspace/Workspace'
 
@@ -35,7 +36,7 @@ export const createClusterIcon = () => {
 export const createMarkerIcon = (pin: IMapPin) => {
   const icon =
     pin.moderation === 'accepted'
-      ? Workspace.findWorkspaceBadge(pin.type, true)
+      ? Workspace.findWorkspaceBadge(pin.type, true, pin.verified)
       : AwaitingModerationHighlight
   if (!pin.type) {
     logger.debug('NO TYPE', pin)

@@ -1,12 +1,18 @@
-import { observable, action, makeObservable, toJS } from 'mobx'
-import { IUser, IUserDB } from 'src/models/user.models'
-import { IUserPP, IUserPPDB } from 'src/models/user_pp.models'
-import { IFirebaseUser, auth, EmailAuthProvider } from 'src/utils/firebase'
-import { Storage } from '../storage'
-import { RootStore } from '..'
+import { observable, action, makeObservable, toJS, computed } from 'mobx'
+import type {
+  INotification,
+  IUser,
+  IUserDB,
+  NotificationType,
+} from 'src/models/user.models'
+import type { IUserPP, IUserPPDB } from 'src/models/user_pp.models'
+import type { IFirebaseUser } from 'src/utils/firebase'
+import { auth, EmailAuthProvider } from 'src/utils/firebase'
+import type { RootStore } from '..'
 import { ModuleStore } from '../common/module.store'
-import { IConvertedFileMeta } from 'src/components/ImageInput/ImageInput'
-import { formatLowerNoSpecial } from 'src/utils/helpers'
+import { Storage } from '../storage'
+import type { IConvertedFileMeta } from 'src/types'
+import { formatLowerNoSpecial, randomID } from 'src/utils/helpers'
 import { logger } from 'src/logger'
 import { getLocationData } from 'src/utils/getLocationData'
 
@@ -27,6 +33,11 @@ export class UserStore extends ModuleStore {
   @observable
   public updateStatus: IUserUpdateStatus = getInitialUpdateStatus()
 
+  // redirect calls for verifiedUsers to the aggregation store list
+  @computed get verifiedUsers(): { [user_id: string]: boolean } {
+    return this.aggregationsStore.aggregations.users_verified || {}
+  }
+
   @action
   public updateUser(user?: IUserPPDB) {
     this.user = user
@@ -41,6 +52,10 @@ export class UserStore extends ModuleStore {
     super(rootStore)
     makeObservable(this)
     this._listenToAuthStateChanges()
+    // Update verified users on intial load. use timeout to ensure aggregation store initialised
+    setTimeout(() => {
+      this.loadVerifiedUsers()
+    }, 50)
   }
 
   // when registering a new user create firebase auth profile as well as database user profile
@@ -141,10 +156,13 @@ export class UserStore extends ModuleStore {
     // sometimes mobx has issues with de-serialising obseverables so try to force it using toJS
     const updatedUserProfile = { ...toJS(user), ...toJS(values) }
 
-
-    if (updatedUserProfile.location?.latlng
-      && Object.keys(updatedUserProfile.location).length == 1) {
-      updatedUserProfile.location = await getLocationData(updatedUserProfile.location.latlng);
+    if (
+      updatedUserProfile.location?.latlng &&
+      Object.keys(updatedUserProfile.location).length == 1
+    ) {
+      updatedUserProfile.location = await getLocationData(
+        updatedUserProfile.location.latlng,
+      )
     }
 
     await this.db
@@ -172,6 +190,11 @@ export class UserStore extends ModuleStore {
     // *** TODO -
   }
 
+  public async getUserEmail() {
+    const user = this.authUser as firebase.default.User
+    return user.email as string
+  }
+
   public async changeUserPassword(oldPassword: string, newPassword: string) {
     // *** TODO - (see code in change pw component and move here)
     const user = this.authUser as firebase.default.User
@@ -181,6 +204,16 @@ export class UserStore extends ModuleStore {
     )
     await user.reauthenticateAndRetrieveDataWithCredential(credentials)
     return user.updatePassword(newPassword)
+  }
+
+  public async changeUserEmail(password: string, newEmail: string) {
+    const user = this.authUser as firebase.default.User
+    const credentials = EmailAuthProvider.credential(
+      user.email as string,
+      password,
+    )
+    await user.reauthenticateAndRetrieveDataWithCredential(credentials)
+    return user.updateEmail(newEmail)
   }
 
   public async sendPasswordResetEmail(email: string) {
@@ -201,10 +234,7 @@ export class UserStore extends ModuleStore {
     try {
       await authUser.reauthenticateAndRetrieveDataWithCredential(credential)
       const user = this.user as IUser
-      await this.db
-        .collection(COLLECTION_NAME)
-        .doc(user.userName)
-        .delete()
+      await this.db.collection(COLLECTION_NAME).doc(user.userName).delete()
       await authUser.delete()
       // TODO - delete user avatar
       // TODO - show deleted notification
@@ -230,6 +260,8 @@ export class UserStore extends ModuleStore {
       userName,
       moderation: 'awaiting-moderation',
       votedUsefulHowtos: {},
+      votedUsefulResearch: {},
+      notifications: [],
       ...fields,
     }
     // update db
@@ -237,13 +269,54 @@ export class UserStore extends ModuleStore {
   }
 
   @action
-  public async updateUsefulHowTos(howtoId: string) {
+  public async updateUsefulHowTos(
+    howtoId: string,
+    howtoAuthor: string,
+    howtoSlug: string,
+  ) {
     if (this.user) {
       // toggle entry on user votedUsefulHowtos to either vote or unvote a howto
       // this will updated the main howto via backend `updateUserVoteStats` function
       const votedUsefulHowtos = toJS(this.user.votedUsefulHowtos) || {}
       votedUsefulHowtos[howtoId] = !votedUsefulHowtos[howtoId]
+
+      if (votedUsefulHowtos[howtoId]) {
+        //get how to author from howtoid
+        this.triggerNotification(
+          'howto_useful',
+          howtoAuthor,
+          '/how-to/' + howtoSlug,
+        )
+      }
       await this.updateUserProfile({ votedUsefulHowtos })
+    }
+  }
+
+  @action
+  public async loadVerifiedUsers() {
+    this.aggregationsStore.updateAggregation('users_verified')
+  }
+
+  @action
+  public async updateUsefulResearch(
+    researchId: string,
+    researchAuthor: string,
+    researchSlug: string,
+  ) {
+    if (this.user) {
+      // toggle entry on user votedUsefulResearch to either vote or unvote a Research
+      // this will updated the main Research via backend `updateUserVoteStats` function
+      const votedUsefulResearch = toJS(this.user.votedUsefulResearch) || {}
+      votedUsefulResearch[researchId] = !votedUsefulResearch[researchId]
+
+      if (votedUsefulResearch[researchId]) {
+        this.triggerNotification(
+          'research_useful',
+          researchAuthor,
+          '/research/' + researchSlug,
+        )
+      }
+      await this.updateUserProfile({ votedUsefulResearch })
     }
   }
 
@@ -252,7 +325,7 @@ export class UserStore extends ModuleStore {
   // strange implementation return the unsubscribe object on subscription, so stored
   // to authUnsubscribe variable for use later
   private _listenToAuthStateChanges(checkEmailVerification = false) {
-    this.authUnsubscribe = auth.onAuthStateChanged(authUser => {
+    this.authUnsubscribe = auth.onAuthStateChanged((authUser) => {
       this.authUser = authUser
       if (authUser) {
         this.userSignedIn(authUser)
@@ -268,6 +341,108 @@ export class UserStore extends ModuleStore {
 
   private _unsubscribeFromAuthStateChanges() {
     this.authUnsubscribe()
+  }
+
+  @action
+  public async triggerNotification(
+    type: NotificationType,
+    username: string,
+    relevantUrl: string,
+  ) {
+    try {
+      const triggeredBy = this.activeUser
+      if (triggeredBy) {
+        // do not get notified when you're the one making a new comment or how-to useful vote
+        if (triggeredBy.userName === username) {
+          return
+        }
+        const newNotification: INotification = {
+          _id: randomID(),
+          _created: new Date().toISOString(),
+          triggeredBy: {
+            displayName: triggeredBy.displayName,
+            userId: triggeredBy._id,
+          },
+          relevantUrl: relevantUrl,
+          type: type,
+          read: false,
+        }
+
+        const lookup = await this.db
+          .collection<IUserPP>(COLLECTION_NAME)
+          .getWhere('userName', '==', username)
+
+        const user = lookup[0]
+
+        const updatedUser: IUser = {
+          ...toJS(user),
+          notifications: user.notifications
+            ? [...toJS(user.notifications), newNotification]
+            : [newNotification],
+        }
+
+        const dbRef = this.db
+          .collection<IUser>(COLLECTION_NAME)
+          .doc(updatedUser._authID)
+
+        await dbRef.set(updatedUser)
+      }
+    } catch (err) {
+      console.error(err)
+      throw new Error(err)
+    }
+  }
+
+  @action
+  public async markAllNotificationsRead() {
+    try {
+      const user = this.activeUser
+      if (user) {
+        const notifications = toJS(user.notifications)
+        notifications?.forEach((notification) => (notification.read = true))
+        const updatedUser: IUser = {
+          ...toJS(user),
+          notifications,
+        }
+
+        const dbRef = this.db
+          .collection<IUser>(COLLECTION_NAME)
+          .doc(updatedUser._authID)
+
+        await dbRef.set(updatedUser)
+        await this.updateUserProfile({ notifications })
+      }
+    } catch (err) {
+      console.error(err)
+      throw new Error(err)
+    }
+  }
+
+  @action
+  public async deleteNotification(id: string) {
+    try {
+      const user = this.activeUser
+      if (id && user && user.notifications) {
+        const notifications = toJS(user.notifications).filter(
+          (notification) => !(notification._id === id),
+        )
+
+        const updatedUser: IUser = {
+          ...toJS(user),
+          notifications,
+        }
+
+        const dbRef = this.db
+          .collection<IUser>(COLLECTION_NAME)
+          .doc(updatedUser._authID)
+
+        await dbRef.set(updatedUser)
+        //TODO: ensure current user is updated
+      }
+    } catch (err) {
+      console.error(err)
+      throw new Error(err)
+    }
   }
 }
 
@@ -297,5 +472,4 @@ const USER_BASE = {
   links: [],
   moderation: 'awaiting-moderation',
   verified: false,
-  badges: { verified: false },
 }

@@ -1,19 +1,11 @@
-import { ISelectorList } from 'src/models/selectorList.models'
+import type { ISelectorList } from 'src/models/selectorList.models'
 
-import styled from 'styled-components'
+import styled from '@emotion/styled'
 import theme from 'src/themes/styled.theme'
-import {
-  color,
-  borderRadius,
-  BorderRadiusProps,
-  space,
-  SpaceProps,
-  fontSize,
-  width,
-  WidthProps,
-} from 'styled-system'
+import type { BorderRadiusProps, SpaceProps, WidthProps } from 'styled-system'
+import { color, borderRadius, space, fontSize, width } from 'styled-system'
 
-import Icon from 'src/components/Icons'
+import { Icon } from 'oa-components'
 
 interface IProps {
   onChange?: () => void

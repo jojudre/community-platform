@@ -2,13 +2,13 @@ import * as React from 'react'
 
 import Flex from 'src/components/Flex'
 import Heading from 'src/components/Heading'
-import { UserStore } from 'src/stores/User/user.store'
-import { Box } from 'rebass/styled-components'
+import type { UserStore } from 'src/stores/User/user.store'
+import { Box } from 'theme-ui'
 import { FlexSectionContainer, ArrowIsSectionOpen } from './elements'
 import { ChangePasswordForm } from './ChangePassword.form'
+import { ChangeEmailForm } from './ChangeEmail.form'
 import { ProfileDelete } from '../ProfileDelete'
 import { observer, inject } from 'mobx-react'
-import { VERSION } from 'src/config/config'
 
 interface IProps {}
 interface IInjectedProps extends IProps {
@@ -38,7 +38,7 @@ export class AccountSettingsSection extends React.Component<any, IState> {
     const { isOpen } = this.state
     return (
       <FlexSectionContainer>
-        <Flex justifyContent="space-between">
+        <Flex sx={{ justifyContent: 'space-between' }}>
           <Heading small>Account settings</Heading>
           <ArrowIsSectionOpen
             onClick={() => {
@@ -48,11 +48,11 @@ export class AccountSettingsSection extends React.Component<any, IState> {
           />
         </Flex>
         <Box mt={2} sx={{ display: isOpen ? 'block' : 'none' }}>
+          <ChangeEmailForm userStore={this.props.userStore} />
           <ChangePasswordForm userStore={this.props.userStore} />
           <ProfileDelete
-            onConfirmation={reauthPw => this.deleteProfile(reauthPw)}
+            onConfirmation={(reauthPw) => this.deleteProfile(reauthPw)}
           />
-          v{VERSION}
         </Box>
       </FlexSectionContainer>
     )

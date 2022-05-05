@@ -1,20 +1,27 @@
 import { format } from 'date-fns'
 import * as React from 'react'
-import { Box, Flex, Image } from 'rebass/styled-components'
+import { Box, Flex, Image } from 'theme-ui'
 import ArrowIcon from 'src/assets/icons/icon-arrow-select.svg'
-import { Button } from 'src/components/Button'
+import { Button, FlagIconHowTos } from 'oa-components'
 import Heading from 'src/components/Heading'
 import { Link } from 'src/components/Links'
 import ModerationStatusText from 'src/components/ModerationStatusText'
 import Text from 'src/components/Text'
-import { IResearch } from 'src/models/research.models'
+import type { IResearch } from 'src/models/research.models'
 import theme from 'src/themes/styled.theme'
+import type { IUser } from 'src/models/user.models'
+import { VerifiedUserBadge } from 'src/components/VerifiedUserBadge/VerifiedUserBadge'
+import { UsefulStatsButton } from 'src/components/UsefulStatsButton/UsefulStatsButton'
 
 interface IProps {
   research: IResearch.ItemDB
   isEditable: boolean
+  loggedInUser: IUser | undefined
   needsModeration: boolean
+  votedUsefulCount?: number
+  hasUserVotedUseful: boolean
   moderateResearch: (accepted: boolean) => void
+  onUsefulClick: () => void
 }
 
 const ResearchDescription: React.FC<IProps> = ({
@@ -48,10 +55,14 @@ const ResearchDescription: React.FC<IProps> = ({
         mt: 4,
       }}
     >
-      <Flex px={4} py={4} flexDirection={'column'} width={1}>
-        <Flex justifyContent="space-between" flexWrap="wrap">
+      <Flex px={4} py={4} sx={{ flexDirection: 'column', width: '100%' }}>
+        <Flex sx={{ justifyContent: 'space-between', flexWrap: 'wrap' }}>
           <Link to={'/research'}>
-            <Button variant="subtle" fontSize="14px" data-cy="go-back">
+            <Button
+              variant="subtle"
+              sx={{ fontSize: '14px' }}
+              data-cy="go-back"
+            >
               <Flex>
                 <Image
                   sx={{
@@ -65,9 +76,19 @@ const ResearchDescription: React.FC<IProps> = ({
               </Flex>
             </Button>
           </Link>
+          {props.votedUsefulCount !== undefined && (
+            <Box style={{ flexGrow: 1 }}>
+              <UsefulStatsButton
+                votedUsefulCount={props.votedUsefulCount}
+                hasUserVotedUseful={props.hasUserVotedUseful}
+                isLoggedIn={props.loggedInUser ? true : false}
+                onUsefulClick={props.onUsefulClick}
+              />
+            </Box>
+          )}
           {/* Check if research should be moderated */}
           {props.needsModeration && (
-            <Flex justifyContent={'space-between'}>
+            <Flex sx={{ justifyContent: 'space-between' }}>
               <Button
                 data-cy={'accept'}
                 variant={'primary'}
@@ -93,19 +114,32 @@ const ResearchDescription: React.FC<IProps> = ({
           )}
         </Flex>
         <Box mt={3} mb={2}>
-          <Flex alignItems="center">
+          <Flex sx={{ alignItems: 'center' }}>
+            {research.creatorCountry && (
+              <FlagIconHowTos code={research.creatorCountry} />
+            )}
             <Text inline auxiliary my={2} ml={1}>
-              By{' '}
-              <Link
-                sx={{
-                  textDecoration: 'underline',
-                  color: 'inherit',
-                }}
-                to={'/u/' + research._createdBy}
-              >
-                {research._createdBy}
-              </Link>{' '}
-              | Started on {format(new Date(research._created), 'DD-MM-YYYY')}
+              <Flex sx={{ alignItems: 'center' }}>
+                By
+                <Link
+                  ml={1}
+                  mr={1}
+                  sx={{
+                    textDecoration: 'underline',
+                    color: 'inherit',
+                  }}
+                  to={'/u/' + research._createdBy}
+                >
+                  {research._createdBy}
+                </Link>
+                <VerifiedUserBadge
+                  userId={research._createdBy}
+                  mr={1}
+                  width="12px"
+                  height="12px"
+                />
+                | Started on {format(new Date(research._created), 'DD-MM-YYYY')}
+              </Flex>
             </Text>
           </Flex>
           <Text

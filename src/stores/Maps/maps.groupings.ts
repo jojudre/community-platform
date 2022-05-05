@@ -1,4 +1,4 @@
-import { IMapGrouping } from 'src/models/maps.models'
+import type { IMapGrouping } from 'src/models/maps.models'
 import Workspace from 'src/pages/User/workspace/Workspace'
 
 // grouping used (icons will be generated from type in method below)
@@ -65,7 +65,7 @@ const GROUPINGS: IMapGrouping[] = [
 ]
 
 // merge groupings with icons above for export
-export const MAP_GROUPINGS = GROUPINGS.map(g => ({
+export const MAP_GROUPINGS = GROUPINGS.map((g) => ({
   ...g,
   icon: Workspace.findWorkspaceBadge(g.type, true),
 }))

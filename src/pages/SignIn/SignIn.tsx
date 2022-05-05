@@ -1,21 +1,21 @@
 import * as React from 'react'
 import { getFriendlyMessage } from 'oa-shared'
 import Flex from 'src/components/Flex'
-import { RouteComponentProps, withRouter } from 'react-router'
+import type { RouteComponentProps } from 'react-router'
+import { withRouter } from 'react-router'
 import { Redirect } from 'react-router'
 import Heading from 'src/components/Heading'
-import { Button } from 'src/components/Button'
+import { Button } from 'oa-components'
 import Text from 'src/components/Text'
 import { Link } from 'src/components/Links'
 import { InputField } from 'src/components/Form/Fields'
 import { inject, observer } from 'mobx-react'
 import { Form, Field } from 'react-final-form'
-import { UserStore } from 'src/stores/User/user.store'
-import {
-  TextNotification,
-  ITextNotificationProps,
-} from 'src/components/Notification/TextNotification'
+import type { UserStore } from 'src/stores/User/user.store'
+import type { ITextNotificationProps } from 'src/components/Notification/TextNotification'
+import { TextNotification } from 'src/components/Notification/TextNotification'
 import { required } from 'src/utils/validators'
+import { Label } from 'theme-ui'
 
 interface IFormValues {
   email: string
@@ -118,7 +118,7 @@ class SignInPage extends React.Component<IProps, IState> {
     }
     return (
       <Form
-        onSubmit={v => this.onLoginSubmit(v as IFormValues)}
+        onSubmit={(v) => this.onLoginSubmit(v as IFormValues)}
         render={({ submitting, values, invalid, handleSubmit }) => {
           // eslint-disable-next-line
           const disabled = invalid || submitting
@@ -128,22 +128,22 @@ class SignInPage extends React.Component<IProps, IState> {
                 <Flex
                   bg="inherit"
                   px={2}
-                  width={1}
+                  sx={{ width: '100%' }}
                   css={{ maxWidth: '620px' }}
                   mx={'auto'}
                   mt={['20px', '100px']}
                   mb={3}
                 >
-                  <Flex flexDirection={'column'} width={1}>
+                  <Flex sx={{ flexDirection: 'column', width: '100%' }}>
                     <Flex
                       card
                       mediumRadius
                       bg={'softblue'}
                       px={3}
                       py={2}
-                      width={1}
+                      sx={{ width: '100%' }}
                     >
-                      <Heading medium width={1}>
+                      <Heading medium sx={{ width: '100%' }}>
                         Welcome back
                       </Heading>
                     </Flex>
@@ -151,13 +151,15 @@ class SignInPage extends React.Component<IProps, IState> {
                       card
                       mediumRadius
                       bg={'white'}
-                      width={1}
                       mt={3}
                       px={4}
                       pt={0}
                       pb={4}
-                      flexWrap="wrap"
-                      flexDirection="column"
+                      sx={{
+                        flexWrap: 'wrap',
+                        flexDirection: 'column',
+                        width: '100%',
+                      }}
                     >
                       {/* PauthProvider Provider Select */}
                       {!this.state.authProvider && (
@@ -165,9 +167,9 @@ class SignInPage extends React.Component<IProps, IState> {
                           <Text mb={3} mt={3}>
                             Login with :
                           </Text>
-                          {Object.values(AUTH_PROVIDERS).map(p => (
+                          {Object.values(AUTH_PROVIDERS).map((p) => (
                             <Button
-                              width={1}
+                              sx={{ width: '100%' }}
                               key={p.provider}
                               mb={2}
                               variant="outline"
@@ -181,13 +183,13 @@ class SignInPage extends React.Component<IProps, IState> {
                       {/* Login Form */}
                       {this.state.authProvider && (
                         <>
-                          <Heading small py={4} width={1}>
+                          <Heading small py={4} sx={{ width: '100%' }}>
                             Log in to your account
                           </Heading>
-                          <Flex flexDirection={'column'} mb={3}>
-                            <Text as={'label'} small htmlFor="title">
+                          <Flex sx={{ flexDirection: 'column' }} mb={3}>
+                            <Label htmlFor="title">
                               {authProvider!.inputLabel}
-                            </Text>
+                            </Label>
                             <Field
                               name="email"
                               type="email"
@@ -196,10 +198,8 @@ class SignInPage extends React.Component<IProps, IState> {
                               validate={required}
                             />
                           </Flex>
-                          <Flex flexDirection={'column'} mb={3}>
-                            <Text as={'label'} small htmlFor="title">
-                              Password
-                            </Text>
+                          <Flex sx={{ flexDirection: 'column' }} mb={3}>
+                            <Label htmlFor="title">Password</Label>
                             <Field
                               name="password"
                               type="password"
@@ -209,7 +209,7 @@ class SignInPage extends React.Component<IProps, IState> {
                             />
                           </Flex>
                           <Text color={'red'}>{this.state.errorMsg}</Text>
-                          <Flex mb={3} justifyContent={'space-between'}>
+                          <Flex mb={3} sx={{ justifyContent: 'space-between' }}>
                             <Text small color={'grey'} mt={2}>
                               <Link to={'/sign-up'} data-cy="no-account">
                                 Don't have an account?
@@ -233,7 +233,7 @@ class SignInPage extends React.Component<IProps, IState> {
                           <Flex>
                             <Button
                               data-cy="submit"
-                              width={1}
+                              sx={{ width: '100%' }}
                               variant={'primary'}
                               disabled={submitting || invalid}
                               type="submit"

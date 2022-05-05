@@ -4,15 +4,11 @@ import webpack from 'webpack'
 import * as os from 'os'
 import * as fs from 'fs-extra'
 import webpackConfig from '../webpack.config'
-import {
-  EMULATOR_EXPORT_FOLDER,
-  EMULATOR_IMPORT_FOLDER,
-  EMULATOR_IMPORT_PATH,
-} from './paths'
-import { emulatorSeed } from './emulator/seed'
+import { EMULATOR_EXPORT_FOLDER, EMULATOR_IMPORT_FOLDER } from './paths'
 
 /**
  * Start the functions emulator and functions source code in parallel
+ * TODO - merge/replace with docker methods
  *
  * NOTE - whilst similar functionality can be achieved with packages like 'concurrently',
  * SIGTERM signals don't seem to always be handled correctly and the emulator doesn't complete
@@ -22,13 +18,13 @@ function main() {
   // CLI: concurrently --kill-others-on-fail --names \"emulator,functions\" -c \"blue,magenta\" \"yarn serve:emulated\" \"yarn watch\"
 
   compileAndWatchFunctions()
-    .then(webpackWatcher => {
+    .then((webpackWatcher) => {
       if (webpackWatcher) {
         // start emulator only after compiler running (to pass close callback)
         startEmulator(webpackWatcher)
       }
     })
-    .catch(err => {
+    .catch((err) => {
       console.error(err)
       process.exit(1)
     })
@@ -57,7 +53,7 @@ async function compileAndWatchFunctions(): Promise<webpack.Compiler.Watching> {
     },
   )
   // Wait for the first build to be completed before resolving (to ensure dist folder populated)
-  return new Promise(resolve => {
+  return new Promise((resolve) => {
     compiler.hooks.afterCompile.tap('build complete', () => {
       resolve(watcher)
     })
@@ -84,8 +80,6 @@ function startEmulator(functionsCompiler: webpack.Compiler.Watching) {
   const EMULATOR_PROJECT_ID = 'emulator-demo'
   let cmd = `${FIREBASE_BIN} use ${REAL_PROJECT_ID} && ${FIREBASE_BIN} --project=${EMULATOR_PROJECT_ID} emulators:start`
 
-  // ensure seed data imported
-  checkSeedData()
   cmd = `${cmd} --import=${EMULATOR_IMPORT_FOLDER}`
 
   // change this value if also wanting to export data
@@ -104,7 +98,7 @@ function startEmulator(functionsCompiler: webpack.Compiler.Watching) {
     env,
   })
   // listen for close and kill functions compiler if error thrown
-  child.on('close', code => {
+  child.on('close', (code) => {
     if (code === 1) {
       console.error('[Emulator Error]')
       functionsCompiler.close(() =>
@@ -112,14 +106,6 @@ function startEmulator(functionsCompiler: webpack.Compiler.Watching) {
       )
     }
   })
-}
-
-function checkSeedData() {
-  // TODO - handle case where seed data exists but newer data available (e.g. specify file)
-  if (!fs.existsSync(EMULATOR_IMPORT_PATH)) {
-    console.log('[Emulator] - Seeding Data')
-    emulatorSeed()
-  }
 }
 
 /**

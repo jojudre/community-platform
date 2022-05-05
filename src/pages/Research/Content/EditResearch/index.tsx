@@ -1,11 +1,12 @@
 import { toJS } from 'mobx'
 import { observer } from 'mobx-react'
 import * as React from 'react'
-import { Redirect, RouteComponentProps } from 'react-router'
+import type { RouteComponentProps } from 'react-router'
+import { Redirect } from 'react-router'
 import { Loader } from 'src/components/Loader'
 import Text from 'src/components/Text'
-import { IResearch } from 'src/models/research.models'
-import { IUser } from 'src/models/user.models'
+import type { IResearch } from 'src/models/research.models'
+import type { IUser } from 'src/models/user.models'
 import ResearchForm from 'src/pages/Research/Content/Common/Research.form'
 import { useResearchStore } from 'src/stores/Research/research.store'
 import { isAllowToEditContent } from 'src/utils/helpers'
@@ -35,7 +36,7 @@ const EditResearch = observer((props: IProps) => {
       let loggedInUser = store.activeUser
       if (!loggedInUser) {
         // TODO - handle the case where user is still loading
-        await new Promise<void>(resolve =>
+        await new Promise<void>((resolve) =>
           setTimeout(() => {
             loggedInUser = store.activeUser
             resolve()
@@ -43,7 +44,7 @@ const EditResearch = observer((props: IProps) => {
         )
       }
       if (store.activeResearchItem! !== undefined) {
-        setState(prevState => ({
+        setState((prevState) => ({
           ...prevState,
           formValues: toJS(store.activeResearchItem) as IResearch.ItemDB,
           isLoading: false,
@@ -52,7 +53,7 @@ const EditResearch = observer((props: IProps) => {
       } else {
         const slug = props.match.params.slug
         const doc = await store.setActiveResearchItem(slug)
-        setState(prevState => ({
+        setState((prevState) => ({
           ...prevState,
           formValues: doc as IResearch.ItemDB,
           isLoading: false,
@@ -76,7 +77,7 @@ const EditResearch = observer((props: IProps) => {
     return isLoading ? (
       <Loader />
     ) : (
-      <Text txtcenter mt="50px" width={1}>
+      <Text txtcenter mt="50px" sx={{ width: '100%' }}>
         Research not found
       </Text>
     )

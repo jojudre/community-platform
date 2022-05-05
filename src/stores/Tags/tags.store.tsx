@@ -1,8 +1,8 @@
 import { observable, action, makeObservable } from 'mobx'
-import { ITag, TagCategory } from 'src/models/tags.model'
+import type { ITag, TagCategory } from 'src/models/tags.model'
 import { arrayToJson } from 'src/utils/helpers'
 import { ModuleStore } from '../common/module.store'
-import { RootStore } from '..'
+import type { RootStore } from '..'
 
 export class TagsStore extends ModuleStore {
   activeCategory?: TagCategory
@@ -35,16 +35,13 @@ export class TagsStore extends ModuleStore {
   }
 
   public saveTag(tag: Partial<ITag>) {
-    return this.db
-      .collection('tags')
-      .doc(tag._id)
-      .set(tag)
+    return this.db.collection('tags').doc(tag._id).set(tag)
   }
 
   private _filterTags() {
     let tags = [...this.allTags]
     if (this.activeCategory) {
-      tags = tags.filter(tag =>
+      tags = tags.filter((tag) =>
         tag.categories.includes(this.activeCategory as TagCategory),
       )
     }

@@ -1,4 +1,5 @@
-import type { ThemeWithName } from "../types"
+import member from 'src/assets/images/themes/project-kamp/badge.svg'
+import type { ThemeWithName } from '../types'
 
 // use enum to specify list of possible colors for typing
 export const colors = {
@@ -45,35 +46,8 @@ export type ButtonVariants =
   | 'subtle'
 
 const space = [
-  0,
-  5,
-  10,
-  15,
-  20,
-  25,
-  30,
-  35,
-  40,
-  45,
-  50,
-  55,
-  60,
-  65,
-  70,
-  75,
-  80,
-  85,
-  90,
-  95,
-  100,
-  105,
-  110,
-  115,
-  120,
-  125,
-  130,
-  135,
-  140,
+  0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95,
+  100, 105, 110, 115, 120, 125, 130, 135, 140,
 ]
 const radii = space
 const fontSizes = [10, 12, 14, 18, 22, 30, 38, 42, 46, 50, 58, 66, 74]
@@ -220,6 +194,9 @@ const typography = {
 
 const StyledComponentTheme: ThemeWithName = {
   name: 'Project Kamp',
+  badges: {
+    member,
+  },
   colors,
   buttons,
   breakpoints,

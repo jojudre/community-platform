@@ -24,14 +24,14 @@ module.exports = {
     {
       type: 'category',
       label: 'Frontend Development',
-      items: ['Frontend Development/overview'],
+      items: ['Frontend Development/overview', 'Frontend Development/modules'],
     },
     {
       type: 'category',
       label: 'Backend Development',
       items: [
         'Backend Development/BackendOverview',
-        'Backend Development/firebase-emulators',
+        'Backend Development/firebase-emulators-docker',
         'Backend Development/integrations',
       ],
     },
@@ -68,6 +68,11 @@ module.exports = {
       type: 'doc',
       label: 'Security',
       id: 'Security',
+    },
+    {
+      type: 'link',
+      label: 'Component Storybook',
+      href: 'pathname:///storybook-static/index.html',
     },
   ],
 }

@@ -8,15 +8,15 @@ import './index.css'
 import { Clusters } from './Cluster'
 import { Popup } from './Popup'
 
-import {
+import type {
   IMapPin,
   ILatLng,
   IBoundingBox,
   IMapGrouping,
 } from 'src/models/maps.models'
 import { inject, observer } from 'mobx-react'
-import { MapsStore } from 'src/stores/Maps/maps.store'
-import { RouteComponentProps } from 'react-router'
+import type { MapsStore } from 'src/stores/Maps/maps.store'
+import type { RouteComponentProps } from 'react-router'
 import { toJS } from 'mobx'
 import type { LatLngExpression } from 'leaflet'
 
@@ -74,8 +74,10 @@ class MapView extends React.Component<IProps> {
     const { center, zoom, pins } = this.props
     const { activePin } = this.injected.mapsStore
 
-    const mapCenter: LatLngExpression = center ? [center.lat, center.lng] : [0, 0]
-    const mapZoom = center ? zoom : 2;
+    const mapCenter: LatLngExpression = center
+      ? [center.lat, center.lng]
+      : [0, 0]
+    const mapZoom = center ? zoom : 2
 
     return (
       <Map
@@ -95,7 +97,7 @@ class MapView extends React.Component<IProps> {
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
         />
-        <Clusters pins={pins} onPinClick={pin => this.pinClicked(pin)} />
+        <Clusters pins={pins} onPinClick={(pin) => this.pinClicked(pin)} />
         {activePin && this.injected.mapsStore.canSeePin(activePin) && (
           // NOTE CC - 2021-07-06 mobx update no longer passing JS object, but observable that needs converting
           <Popup activePin={toJS(activePin)} map={this.props.mapRef} />

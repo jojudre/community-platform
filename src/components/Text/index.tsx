@@ -1,9 +1,6 @@
-import {
-  Text as RebassText,
-  TextProps as RebassTextProps,
-} from 'rebass/styled-components'
-import theme from 'src/themes/styled.theme'
-import styled from 'styled-components'
+import { Text as ThemeUiText } from 'theme-ui'
+import theme from '../../themes/styled.theme'
+import styled from '@emotion/styled'
 
 export interface ITextProps {
   uppercase?: boolean
@@ -13,7 +10,6 @@ export interface ITextProps {
   capitalize?: boolean
   bold?: boolean
   txtRight?: boolean
-
   large?: boolean
   medium?: boolean
   small?: boolean
@@ -29,31 +25,31 @@ export interface ITextProps {
   critical?: boolean
   dashed?: boolean
   cropBottomRight?: boolean
-  theme?: any;
+  theme?: any
 }
 
-export const uppercase = props =>
+export const uppercase = (props: ITextProps) =>
   props.uppercase
-    ? {
+    ? ({
         textTransform: 'uppercase',
-      }
+      } as const)
     : null
 
-export const capitalize = props =>
+export const capitalize = (props: ITextProps) =>
   props.capitalize
-    ? {
+    ? ({
         textTransform: 'capitalize',
-      }
+      } as const)
     : null
 
 export const inline = (props: ITextProps) =>
-  props.inline ? { display: 'inline-block' } : null
+  props.inline ? { display: 'inline-block' } : { display: 'block' }
 
 export const txtcenter = (props: ITextProps) =>
-  props.txtcenter ? { textAlign: 'center' } : null
+  props.txtcenter ? ({ textAlign: 'center' } as const) : null
 
 export const txtRight = (props: ITextProps) =>
-  props.txtRight ? { textAlign: 'right' } : null
+  props.txtRight ? ({ textAlign: 'right' } as const) : null
 
 export const regular = (props: ITextProps) =>
   props.regular ? { fontWeight: 400 } : null
@@ -84,11 +80,15 @@ export const superSmall = (props: ITextProps) =>
 
 export const clipped = (props: ITextProps) =>
   props.clipped
-    ? { whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }
+    ? ({
+        whiteSpace: 'nowrap',
+        textOverflow: 'ellipsis',
+        overflow: 'hidden',
+      } as const)
     : null
 
 export const preLine = (props: ITextProps) =>
-  props.preLine ? { whiteSpace: 'pre-line' } : null
+  props.preLine ? ({ whiteSpace: 'pre-line' } as const) : null
 
 export const highlight = (props: ITextProps) =>
   props.highlight
@@ -117,35 +117,53 @@ export const cropBottomRight = (props: ITextProps) =>
       }
     : null
 
-// any export to fix: https://github.com/microsoft/TypeScript/issues/37597
-export const BaseText = styled(RebassText as any)`
+export const Text = styled(ThemeUiText, {
+  // avoid passing custom props
+  shouldForwardProp: (prop: keyof ITextProps) =>
+    ![
+      'inline',
+      'uppercase',
+      'capitalize',
+      'regular',
+      'bold',
+      'txtcenter',
+      'large',
+      'medium',
+      'small',
+      'superSmall',
+      'clipped',
+      'preLine',
+      'tags',
+      'auxiliary',
+      'paragraph',
+      'txtRight',
+      'highlight',
+      'critical',
+      'dashed',
+      'cropBottomRight',
+    ].includes(prop),
+})<ITextProps>`
   ${inline}
-  ${uppercase as any}
-  ${capitalize as any}
+  ${uppercase}
+  ${capitalize}
   ${regular}
   ${bold}
-	${txtcenter as any}
+  ${txtcenter}
   ${large}
   ${medium}
   ${small}
   ${superSmall}
-  ${clipped as any}
-	${preLine as any}
-	${tags}
-	${auxiliary}
-	${paragraph}
-  ${txtRight as any}
+  ${clipped}
+  ${preLine}
+  ${tags}
+  ${auxiliary}
+  ${paragraph}
+  ${txtRight}
   ${highlight}
   ${critical}
   ${dashed}
   ${cropBottomRight}
 `
-
-type TextProps = ITextProps & RebassTextProps
-
-// TODO - incorporate custom css into rebass props to allow things like below to be passed
-export const Text = (props: TextProps) => (
-  <BaseText {...(props as any)}>{props.children}</BaseText>
-)
-
+// Fix lint issue https://stackoverflow.com/questions/67992894/component-definition-is-missing-display-name-for-forwardref
+Text.displayName = 'Text'
 export default Text

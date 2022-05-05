@@ -4,12 +4,12 @@ import Heading from 'src/components/Heading'
 import { Field } from 'react-final-form'
 import Text from 'src/components/Text'
 import { TextAreaField } from 'src/components/Form/Fields'
-import { Box, Flex, Link } from 'rebass/styled-components'
+import { Box, Flex, Link } from 'theme-ui'
 import { FlexSectionContainer, ArrowIsSectionOpen } from './elements'
 import { MAP_GROUPINGS } from 'src/stores/Maps/maps.groupings'
 import theme from 'src/themes/styled.theme'
 import { required } from 'src/utils/validators'
-import { ILocation } from 'src/models/common.models'
+import type { ILocation } from 'src/models/common.models'
 import MapWithDraggablePin from 'src/components/MapWithDraggablePin/MapWithDraggablePin'
 import { randomIntFromInterval } from 'src/utils/helpers'
 
@@ -33,7 +33,7 @@ export class WorkspaceMapPinSection extends React.Component<any, IState> {
 
     return (
       <FlexSectionContainer>
-        <Flex justifyContent="space-between">
+        <Flex sx={{ justifyContent: 'space-between' }}>
           <Heading small id="your-map-pin">
             Your map pin
           </Heading>
@@ -75,7 +75,7 @@ export class WorkspaceMapPinSection extends React.Component<any, IState> {
           />
           <Field
             name={'location'}
-            render={props => {
+            render={(props) => {
               const { value } = props.input
               const defaultLocation = {
                 latlng: {
@@ -100,7 +100,7 @@ export class WorkspaceMapPinSection extends React.Component<any, IState> {
 
                     <MapWithDraggablePin
                       position={location.latlng}
-                      updatePosition={newPosition => {
+                      updatePosition={(newPosition) => {
                         props.input.onChange({
                           latlng: newPosition,
                         })

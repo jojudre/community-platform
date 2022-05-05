@@ -1,5 +1,4 @@
 [![react](https://badges.aleen42.com/src/react.svg)](https://reactjs.org/docs/getting-started.html)
-[![Style: Styled-components](https://img.shields.io/badge/style-%F0%9F%92%85%20styled--components-orange.svg?colorB=daa357&colorA=db748e)](https://github.com/styled-components/styled-components)
 
 # Contribution Guidelines
 
@@ -19,6 +18,7 @@ If you think something is missing, consider sending us a PR.
 - [Project structure](https://github.com/ONEARMY/community-platform/blob/master/CONTRIBUTING.md#--project-structure)
 - [Branch structure](https://github.com/ONEARMY/community-platform/blob/master/CONTRIBUTING.md#--branch-structure)
 - [Javascript style guide](https://github.com/ONEARMY/community-platform/blob/master/CONTRIBUTING.md#--javascript-style-guide)
+- [Commit style guide](https://github.com/ONEARMY/community-platform/blob/master/CONTRIBUTING.md#--commit-style-guide)
 - [Why haven't you used ...](https://github.com/ONEARMY/community-platform/blob/master/CONTRIBUTING.md#-why-havent-you-used-insert-favourite-languageframeworkconvention-here)
 - [Deployment](https://github.com/ONEARMY/community-platform/blob/master/CONTRIBUTING.md#--deployment)
 - [Joining the team](https://github.com/ONEARMY/community-platform/blob/master/CONTRIBUTING.md#--joining-the-team)
@@ -32,7 +32,7 @@ This project and everyone participating in it is governed by the [Code of Conduc
 
 ### Frontend
 
-The platform is built in **React** and [Typescript](https://www.typescriptlang.org/docs/handbook/basic-types.html) for typing and consistency, [styled-components](https://www.styled-components.com/) for reusability and component based styling.
+The platform is built in **React** and [Typescript](https://www.typescriptlang.org/docs/handbook/basic-types.html) for typing and consistency, [Emotion](https://emotion.sh/) for reusability and component based styling.
 We created a frontend guide to explain our choices and best practice in building the One Army interface. This guide is available in [the wiki](https://github.com/ONEARMY/community-platform/wiki/Frontend).
 
 ### Backend
@@ -122,6 +122,29 @@ The `master` branch is our current development leading branch, and will autodepl
 As this is a large project spread across many developers it is important that the code is both clean and consistent. We use the Prettier style guide to enforce certain conventions through the linting system – if using VSCode (which we highly recommend) it is recommended that you install and setup the [prettier plugin](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode) to track errors in real time.
 
 We also expect code to follow standard best practices, such as sensible variable naming, informative comments and avoiding files larger than a couple hundred lines of code (with emphasis on usability and reusability).
+
+Running `yarn format` from the project route prior to committing will ensure the code you're adding is formatted to align with the standards of this project.
+
+## 🔬 &nbsp; Commit style guide
+
+To help everyone with understanding the commit history of this project and support our automated release tooling the following commit rules are enforced.
+
+- commit message format of `$type($scope): $message`, for example: `docs: add commit style guide`
+- maximum of 100 characters
+
+For those of you who work with git hooks, this project offers a husky commit message as well.
+
+Here's a more detailed explanation of how you can format the commit message heading:
+
+```
+<type>(<scope>): <short summary>
+  │       │             │
+  │       │             └─⫸ Summary in present tense. Not capitalized. No period at the end.
+  │       │
+  │       └─⫸ Commit Scope (optional): platform|docs|storybook|functions|scripts
+  │
+  └─⫸ Commit Type: build|ci|docs|feat|fix|perf|refactor|test
+```
 
 ### 😖 Why haven't you used [insert favourite language/framework/convention here]
 

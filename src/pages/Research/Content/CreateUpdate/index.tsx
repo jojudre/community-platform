@@ -1,6 +1,7 @@
 import { observer } from 'mobx-react'
 import * as React from 'react'
-import { Redirect, RouteComponentProps } from 'react-router'
+import type { RouteComponentProps } from 'react-router'
+import { Redirect } from 'react-router'
 import Loader from 'src/components/Loader'
 import { Text } from 'src/components/Text'
 import { useResearchStore } from 'src/stores/Research/research.store'
@@ -19,7 +20,7 @@ const CreateUpdate = observer((props: IProps) => {
       let loggedInUser = store.activeUser
       if (!loggedInUser) {
         // TODO - handle the case where user is still loading
-        await new Promise<void>(resolve =>
+        await new Promise<void>((resolve) =>
           setTimeout(() => {
             loggedInUser = store.activeUser
             resolve()
@@ -52,7 +53,7 @@ const CreateUpdate = observer((props: IProps) => {
     )
   } else {
     return (
-      <Text txtcenter mt="50px" width={1}>
+      <Text txtcenter mt="50px" sx={{ width: '100%' }}>
         Research not found
       </Text>
     )

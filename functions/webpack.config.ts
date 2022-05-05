@@ -46,8 +46,7 @@ const config: webpack.Configuration = {
         include: [
           __dirname,
           // Include any external modules here
-          // Note - yarn workspaces are bundled with node_modules so do not need to be included
-          // path.resolve(__dirname, '../shared/'),
+          path.resolve(__dirname, '../shared/'),
         ],
       },
     ],
@@ -95,8 +94,8 @@ function generatePackageJson() {
   const workspacePrefixes = ['oa-', 'one-army', 'onearmy', '@oa', '@onearmy']
   // TODO - could generate actual workspace list from `yarn workspace list --json`
   // remove workspace dependencies
-  Object.keys(json.dependencies).forEach(key => {
-    if (workspacePrefixes.find(prefix => key.startsWith(prefix))) {
+  Object.keys(json.dependencies).forEach((key) => {
+    if (workspacePrefixes.find((prefix) => key.startsWith(prefix))) {
       delete json.dependencies[key]
     }
   })

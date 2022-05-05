@@ -1,7 +1,7 @@
-import * as React from 'react';
+import * as React from 'react'
 import { ImageInput } from '../ImageInput/ImageInput'
 import { ErrorMessage, FieldContainer } from './elements'
-import { IFieldProps } from './Fields'
+import type { IFieldProps } from './Fields'
 
 // Assign correct typing so that ImageInput props can also be passed down to child
 // Note, partial as default onChange function provided
@@ -31,7 +31,7 @@ export const ImageInputField = ({
         value={input.value}
         // as validation happens on blur also want to artificially trigger when values change
         // (no native blur event)
-        onFilesChange={value => {
+        onFilesChange={(value) => {
           input.onChange(value)
           if (customChange) {
             customChange(value)

@@ -1,11 +1,17 @@
-import type { ThemeWithName } from "../types"
+import memberBadge from 'src/assets/images/themes/precious-plastic/badge-member.svg'
+import CollectionBadge from 'src/assets/images/badges/pt-collection-point.svg'
+import MachineBadge from 'src/assets/images/badges/pt-machine-shop.svg'
+import WorkspaceBadge from 'src/assets/images/badges/pt-workspace.svg'
+import LocalComBadge from 'src/assets/images/badges/pt-local-community.svg'
+
+import type { ThemeWithName } from '../types'
 
 // use enum to specify list of possible colors for typing
 export const colors = {
   white: 'white',
   offwhite: '#ececec',
   black: '#1b1b1b',
-  primary: 'green',
+  primary: 'red',
   softyellow: '#f5ede2',
   yellow: { base: '#fee77b', hover: '#ffde45' },
   blue: '#83ceeb',
@@ -45,35 +51,8 @@ export type ButtonVariants =
   | 'subtle'
 
 const space = [
-  0,
-  5,
-  10,
-  15,
-  20,
-  25,
-  30,
-  35,
-  40,
-  45,
-  50,
-  55,
-  60,
-  65,
-  70,
-  75,
-  80,
-  85,
-  90,
-  95,
-  100,
-  105,
-  110,
-  115,
-  120,
-  125,
-  130,
-  135,
-  140,
+  0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95,
+  100, 105, 110, 115, 120, 125, 130, 135, 140,
 ]
 const radii = space
 const fontSizes = [10, 12, 14, 18, 22, 30, 38, 42, 46, 50, 58, 66, 74]
@@ -220,6 +199,13 @@ const typography = {
 
 const StyledComponentTheme: ThemeWithName = {
   name: 'Precious Plastic',
+  badges: {
+    member: memberBadge,
+    workspace: WorkspaceBadge,
+    'community-builder': LocalComBadge,
+    'collection-point': CollectionBadge,
+    'machine-builder': MachineBadge,
+  },
   bold,
   breakpoints,
   buttons,
